@@ -1,0 +1,642 @@
+{
+	"compiler": {
+		"version": "0.6.12+commit.27d51765"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "ZenAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address[]",
+						"name": "initialDelegates",
+						"type": "address[]"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newAuth",
+						"type": "address"
+					}
+				],
+				"name": "NewAuthorization",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "newDelay",
+						"type": "uint256"
+					}
+				],
+				"name": "NewDelay",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "enum Sensei.Functions",
+						"name": "newUnLockRequest",
+						"type": "uint8"
+					}
+				],
+				"name": "NewLockRequest",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "newMinSignatures",
+						"type": "uint256"
+					}
+				],
+				"name": "NewMinSignatures",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newRevoke",
+						"type": "address"
+					}
+				],
+				"name": "NewRevokeAuthorization",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "enum Sensei.Functions",
+						"name": "newUnlockRequest",
+						"type": "uint8"
+					}
+				],
+				"name": "NewUnlockRequest",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "GRACE_PERIOD",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "MAXIMUM_DELAY",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "MAX_DELEGATES",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "MINIMUM_DELAY",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "MIN_DELEGATES",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum Sensei.Functions",
+						"name": "_fn",
+						"type": "uint8"
+					}
+				],
+				"name": "Sign",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "add",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "addAdmin",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "addAuthorization",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "delay",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "contract IBEP20",
+						"name": "_lpToken",
+						"type": "address"
+					}
+				],
+				"name": "getLpPoolExists",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum Sensei.Functions",
+						"name": "_fn",
+						"type": "uint8"
+					}
+				],
+				"name": "getNumSignatures",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum Sensei.Functions",
+						"name": "_func",
+						"type": "uint8"
+					}
+				],
+				"name": "getTimeLock",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract IBEP20",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getZenMasterAddress",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_user",
+						"type": "address"
+					}
+				],
+				"name": "isApprovedAdmin",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_user",
+						"type": "address"
+					}
+				],
+				"name": "isApprovedToSign",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum Sensei.Functions",
+						"name": "_fn",
+						"type": "uint8"
+					}
+				],
+				"name": "lockRequest",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "minSignatures",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "revokeAdmin",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "revokeAuthorization",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "set",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "delay_",
+						"type": "uint256"
+					}
+				],
+				"name": "setDelay",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "totalDelegates",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum Sensei.Functions",
+						"name": "_fn",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "poolAllocationPts_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "pid_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract IBEP20",
+						"name": "lpToken_",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "withUpdateAll_",
+						"type": "bool"
+					},
+					{
+						"internalType": "address",
+						"name": "delegateAddress_",
+						"type": "address"
+					}
+				],
+				"name": "unlockRequest",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_newMin",
+						"type": "uint256"
+					}
+				],
+				"name": "updateMinSignatures",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/omnidex-farms/Sensei.sol": "Sensei"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@pancakeswap/pancake-swap-lib/contracts/GSN/Context.sol": {
+			"keccak256": "0xb5d5654ea9545f91be35321202e885255490867560afbc0c6a55f8b6c4068386",
+			"license": "GPL-3.0-or-later",
+			"urls": [
+				"bzz-raw://ad45743b2fb8322c467618955a89bb82e40b6b730f19c04bf4b0e5eb6d25f39b",
+				"dweb:/ipfs/QmR7HdkW9VsAeiSQRrA3LntW36RCv5iczoLkBcQpTc2UYo"
+			]
+		},
+		"@pancakeswap/pancake-swap-lib/contracts/access/Ownable.sol": {
+			"keccak256": "0xe4099b9c99c22b28d8c1676803e2ff6f34ddc043d1e8631476e8e417c81aa7a3",
+			"license": "GPL-3.0-or-later",
+			"urls": [
+				"bzz-raw://dc140c98056178b731be974f42d523134258162fdf379ef6ed2eeb234fc067df",
+				"dweb:/ipfs/QmZNQ3FNYS17E2HjyX4eqk7RYfSJtaG5b47W27xatJjNeo"
+			]
+		},
+		"@pancakeswap/pancake-swap-lib/contracts/math/SafeMath.sol": {
+			"keccak256": "0xd4b1686c1494213666dc1423cea64333c3063f334327216d69ca3d59f75a2517",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3a3c967dc005a8966266b6052724b7cd04231c6d95abcc03f49e1cbb9ffb890a",
+				"dweb:/ipfs/QmRWofmmac5HLRYpMTDQLzmgZyJYeYLB2MY8uTFRKfJuJL"
+			]
+		},
+		"@pancakeswap/pancake-swap-lib/contracts/token/BEP20/BEP20.sol": {
+			"keccak256": "0x0442404a56112b52de7e4a64eb0d9fe346add08d122b52e848e43c9f22d707c5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://abbecb866acdd459f567efac348a519758c46ca0b53415c484b28b2d28c7b19f",
+				"dweb:/ipfs/Qmdo86JSfRcqoMr6Z2H3k1NMZQ6qZCSvSihzCb5Eq7d8DJ"
+			]
+		},
+		"@pancakeswap/pancake-swap-lib/contracts/token/BEP20/IBEP20.sol": {
+			"keccak256": "0xcca9eeefad9d3c8a68e426833a5c790d055beebc3f1cefbeac20b096456c9aef",
+			"license": "GPL-3.0-or-later",
+			"urls": [
+				"bzz-raw://61090ac66da4fcf117cb95119cda4c45b5bcf9f8a48203444b0f97b39a9ccbd1",
+				"dweb:/ipfs/Qmb1XnfUGdZ7ma31WqhGMaE9mWug1erEUh8xEYvvjZ5v4r"
+			]
+		},
+		"@pancakeswap/pancake-swap-lib/contracts/token/BEP20/SafeBEP20.sol": {
+			"keccak256": "0xaf7a7cce5c7e15107bdb2c074331471d301e2766dac8942cf92f0298df7cd0b3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1b658c964602f8144999d0fe08f9dcd0494abfeeb839e9d54812d690c10c21ca",
+				"dweb:/ipfs/QmYNVqdu4QjwDKQ5K7ATwhByPoae1uKMguxmoCRKnc8QmP"
+			]
+		},
+		"@pancakeswap/pancake-swap-lib/contracts/utils/Address.sol": {
+			"keccak256": "0x806c8686fdf1afac78d0828ca7941e5ac30282a358d23cf502ec39893c64d4af",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://be41cfa7e8aaf4c95e1517007964cef2470abd47ad578293db4cd25434ee77ea",
+				"dweb:/ipfs/QmPX9qcHJNv1vA6Nxue8c46wxdXwKdLcUyXxEQ91F93u7a"
+			]
+		},
+		"contracts/omnidex-farms/CharmToken.sol": {
+			"keccak256": "0x53d576416828d2ee649249b441cbc5b6e2ca11bc935b93559533cbbe772cdb2d",
+			"urls": [
+				"bzz-raw://ebe3f3f70f0e956853d89fcef223e5980894c09a8e24599a8edcea536186c4c4",
+				"dweb:/ipfs/QmR9EWcyWonUPEAjQEn1b6PuMzGzMxiZy4uHXaRFrM2FZN"
+			]
+		},
+		"contracts/omnidex-farms/Sensei.sol": {
+			"keccak256": "0xa08e4e19fb3680c16521d8069e82c299c1ed47ff9dc29f279b2677648698b462",
+			"urls": [
+				"bzz-raw://2581e8c26232262ffb9c63d73000180eca24d0cb3643b6181c09c0beae320388",
+				"dweb:/ipfs/QmfDjxrVpPY95hicgJwMxgZ5uL5SYv3f7WRKjPvMpaaes5"
+			]
+		},
+		"contracts/omnidex-farms/SpellBar.sol": {
+			"keccak256": "0xae45cd637c8753372efd1d7079aea0377a92c6396687eefca673e8e30b8db7b7",
+			"urls": [
+				"bzz-raw://205148d23e000ddd275b34127caf0df2a6b61b51f0d01d84fb8ec5548185a02b",
+				"dweb:/ipfs/QmUcvPruZJD5KF1vv2diiAXHiBkS6L4CsZPjewDxiqTp6F"
+			]
+		},
+		"contracts/omnidex-farms/ZenMaster.sol": {
+			"keccak256": "0xe186820ed8e331a7d1c7f4438d6c6ce21f9880566766dbf1a41754181a982441",
+			"urls": [
+				"bzz-raw://482d319696fb0638e0c7768d6e1ccb298294782ca3bdf58d3dc53ff5e2899f39",
+				"dweb:/ipfs/QmPKPZ26urf9C6AWeUstbszABERNhw1KQ79ZjQhhxXrpGb"
+			]
+		}
+	},
+	"version": 1
+}
