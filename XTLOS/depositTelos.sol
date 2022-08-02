@@ -23,17 +23,57 @@ contract depositTLOS {
         xTLOS = IXTLOS(_xTLOS);
         omnidexLoop = IOmniDexLoop(_loopingContract);
         karmaContract = ICharmDojo(_CharmDojo);
-
         }
 
-    function Deposit() public payable{
+    function getTier(address _address) public view returns(string memory result, uint id){
+        // uint256 userBal = karmaContract.charmBalance(_address);
+        uint256 userBal = 100000;
+        if(userBal<100000){
+            return ("Bronze",1);
+        }
+        else if( userBal >= 100000 && userBal < 250000 ){
+            return ("Silver",2);
+        }
+        else if(userBal >= 250000 && userBal < 500000 ){
+            return ("Gold",3);
+        }
+        else{
+            return ("Platinum",4);
+        }
+    }
+
+    function Deposit(address _address) public payable{
+        
         balances[msg.sender] += msg.value;
         wrapTLOS.deposit{value: msg.value }();
         xTLOS.mint(address(this), msg.value);
         XTLOSBalances[msg.sender] += msg.value;
+
+        uint256 maxDeposit =1000;
         uint256 principal = msg.value;
-        uint256 iterations = 4;
-        omnidexLoop.enterPosition(principal, iterations);
+        require(principal<maxDeposit, "Exceeded maximum deposit allowance");
+        string memory UserTier; uint id; (,id) = getTier(_address);
+        
+        if(id==1){
+            uint256 iterations = 2;
+            omnidexLoop.enterPosition(principal, iterations);
+
+            }
+        else if(id==2) {
+            uint256 iterations =3;
+            omnidexLoop.enterPosition(principal, iterations);
+
+        }
+        else if(id==3) {
+            uint256 iterations =8;
+            omnidexLoop.enterPosition(principal, iterations);
+
+        }
+        else if(id==4) {
+            uint256 iterations =20;
+            omnidexLoop.enterPosition(principal, iterations);
+
+        }
     }
 
     function getBalance() public view returns (uint256) {
@@ -52,24 +92,6 @@ contract depositTLOS {
         payable(msg.sender).transfer(address(this).balance);
         // (bool sent,) = msg.sender.call{value: _amount}(“sent”);
         // require(sent, “Failed to Complete”);
-    }
-
-    function getTier(address _address) public view returns(string memory result){
-        // uint256 userBal = karmaContract.charmBalance(_address);
-        uint256 userBal = 100000;
-        if(userBal<100000){
-            result = "Bronze";
-        }
-        else if( userBal >= 100000 && userBal < 250000 ){
-            result = "Silver";
-        }
-        else if(userBal >= 250000 && userBal < 500000 ){
-            result = "Gold";
-        }
-        else{
-            result = "Platinum";
-        }
-        return result;
     }
 
 }
