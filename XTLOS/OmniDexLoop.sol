@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./interfaces/IOmniDexInterfaces.sol";
+import "./interfaces/IDepositTelos.sol";
 import "./ImmutableOwnable.sol";
 
 /**
@@ -19,25 +20,31 @@ contract OmniDexLoop is ImmutableOwnable {
     uint256 public constant USE_VARIABLE_DEBT = 2;
     uint256 public constant SAFE_BUFFER = 10; // wei
 
-    ERC20 public immutable ASSET; // solhint-disable-line
+    ERC20 public immutable SUPPLY_ASSET; // solhint-disable-line
+    ERC20 public immutable BORROW_ASSET; // solhint-disable-line
+    IDepositTelos public immutable DEPOSIT_TELOS; // solhint-disable-line
     ILendingPool public immutable LENDING_POOL; // solhint-disable-line
     IOmniDexIncentivesController public immutable INCENTIVES; // solhint-disable-line
 
     /**
      * @param owner The contract owner, has complete ownership, immutable
-     * @param asset The target underlying asset ex. USDC
+     * @param supply_asset The target underlying supply_asset ex. USDC
      * @param lendingPool The deployed OMNIDEX ILendingPool
      * @param incentives The deployed OMNIDEX IOmniDexIncentivesController
      */
     constructor(
         address owner,
-        address asset,
+        address supply_asset,
+        address borrow_asset,
+        address depositTelos,
         address lendingPool,
         address incentives
     ) ImmutableOwnable(owner) {
-        require(asset != address(0) && lendingPool != address(0) && incentives != address(0), "address 0");
+        require(supply_asset != address(0) && lendingPool != address(0) && incentives != address(0), "address 0");
 
-        ASSET = ERC20(asset);
+        SUPPLY_ASSET = ERC20(supply_asset);
+        BORROW_ASSET = ERC20(borrow_asset);
+        DEPOSIT_TELOS = IDepositTelos(depositTelos);
         LENDING_POOL = ILendingPool(lendingPool);
         INCENTIVES = IOmniDexIncentivesController(incentives);
     }
@@ -45,48 +52,64 @@ contract OmniDexLoop is ImmutableOwnable {
     // ---- views ----
 
     function getSupplyAndBorrowAssets() public view returns (address[] memory assets) {
-        DataTypes.ReserveData memory data = LENDING_POOL.getReserveData(address(ASSET));
+        DataTypes.ReserveData memory supply_data = LENDING_POOL.getReserveData(address(SUPPLY_ASSET));
+        DataTypes.ReserveData memory borrow_data = LENDING_POOL.getReserveData(address(BORROW_ASSET));
+
         assets = new address[](2);
-        assets[0] = data.aTokenAddress;
-        assets[1] = data.variableDebtTokenAddress;
+        assets[0] = supply_data.aTokenAddress;
+        assets[1] = borrow_data.variableDebtTokenAddress;
     }
 
     /**
-     * @return The ASSET price in ETH according to OmniDex PriceOracle, used internally for all ASSET amounts calculations
+     * @return The SUPPLY_ASSET price in ETH according to OmniDex PriceOracle, used internally for all SUPPLY_ASSET amounts calculations
      */
-    function getAssetPrice() public view returns (uint256) {
-        return IOmniDexPriceOracle(LENDING_POOL.getAddressesProvider().getPriceOracle()).getAssetPrice(address(ASSET));
+    function getSupplyAssetPrice() public view returns (uint256) {
+        return IOmniDexPriceOracle(LENDING_POOL.getAddressesProvider().getPriceOracle()).getAssetPrice(address(SUPPLY_ASSET));
     }
 
     /**
-     * @return total supply balance in ASSET
+     * @return The BORROW_ASSET price in ETH according to OmniDex PriceOracle, used internally for all BORROW_ASSET amounts calculations
+     */
+    function getBorrowAssetPrice() public view returns (uint256) {
+        return IOmniDexPriceOracle(LENDING_POOL.getAddressesProvider().getPriceOracle()).getAssetPrice(address(BORROW_ASSET));
+    }
+
+    /**
+     * @return total supply balance in SUPPLY_ASSET
      */
     function getSupplyBalance() public view returns (uint256) {
         (uint256 totalCollateralETH, , , , , ) = getPositionData();
-        return (totalCollateralETH * (10**ASSET.decimals())) / getAssetPrice();
+        return (totalCollateralETH * (10**SUPPLY_ASSET.decimals())) / getSupplyAssetPrice();
     }
 
     /**
-     * @return total borrow balance in ASSET
+     * @return total borrow balance in BORROW_ASSET
      */
     function getBorrowBalance() public view returns (uint256) {
         (, uint256 totalDebtETH, , , , ) = getPositionData();
-        return (totalDebtETH * (10**ASSET.decimals())) / getAssetPrice();
+        return (totalDebtETH * (10**BORROW_ASSET.decimals())) / getBorrowAssetPrice();
     }
 
     /**
-     * @return available liquidity in ASSET
+     * @return available liquidity in BORROW_ASSET
      */
     function getLiquidity() public view returns (uint256) {
         (, , uint256 availableBorrowsETH, , , ) = getPositionData();
-        return (availableBorrowsETH * (10**ASSET.decimals())) / getAssetPrice();
+        return (availableBorrowsETH * (10**BORROW_ASSET.decimals())) / getSupplyAssetPrice();  // !? Changed from Supply asset to Borrow asset.
     }
 
     /**
-     * @return ASSET balanceOf(this)
+     * @return SUPPLY_ASSET balanceOf(this)
      */
-    function getAssetBalance() public view returns (uint256) {
-        return ASSET.balanceOf(address(this));
+    function getSupplyAssetBalance() public view returns (uint256) {
+        return SUPPLY_ASSET.balanceOf(address(this));
+    }
+
+    /**
+     * @return BORROW_ASSET balanceOf(this)
+     */
+    function getBorrowAssetBalance() public view returns (uint256) {
+        return BORROW_ASSET.balanceOf(address(this));
     }
 
     /**
@@ -97,7 +120,7 @@ contract OmniDexLoop is ImmutableOwnable {
     }
 
     /**
-     * Position data from OmniDex
+     * Position data from OmniLend
      */
     function getPositionData()
         public
@@ -115,10 +138,10 @@ contract OmniDexLoop is ImmutableOwnable {
     }
 
     /**
-     * @return LTV of ASSET in 4 decimals ex. 82.5% == 8250
+     * @return LTV of SUPPLY_ASSET in 4 decimals ex. 82.5% == 8250
      */
     function getLTV() public view returns (uint256) {
-        DataTypes.ReserveConfigurationMap memory config = LENDING_POOL.getConfiguration(address(ASSET));
+        DataTypes.ReserveConfigurationMap memory config = LENDING_POOL.getConfiguration(address(SUPPLY_ASSET));
         return config.data & 0xffff; // bits 0-15 in BE
     }
 
@@ -137,27 +160,30 @@ contract OmniDexLoop is ImmutableOwnable {
      * @param iterations - Loop count
      * @return Liquidity at end of the loop
      */
-    function enterPositionFully(uint256 iterations) external onlyOwner returns (uint256) {
-        return enterPosition(ASSET.balanceOf(msg.sender), iterations);
+    function enterPositionFully(uint256 iterations, address _address) external onlyOwner returns (uint256) {
+        return enterPosition(SUPPLY_ASSET.balanceOf(msg.sender), iterations, _address);
     }
 
     /**
-     * @param principal - ASSET transferFrom sender amount, can be 0
+     * @param principal - SUPPLY_ASSET transferFrom sender amount, can be 0
      * @param iterations - Loop count
      * @return Liquidity at end of the loop
      */
-    function enterPosition(uint256 principal, uint256 iterations) public onlyOwner returns (uint256) {
+    function enterPosition(uint256 principal, uint256 iterations, address _address) public onlyOwner returns (uint256) {
         if (principal > 0) {
-            ASSET.safeTransferFrom(msg.sender, address(this), principal);
+            SUPPLY_ASSET.safeTransferFrom(msg.sender, address(this), principal);
         }
 
-        if (getAssetBalance() > 0) {
-            _supply(getAssetBalance());
+        if (getSupplyAssetBalance() > 0) {
+            _supply(getSupplyAssetBalance());
         }
 
         for (uint256 i = 0; i < iterations; i++) {
+            
             _borrow(getLiquidity() - SAFE_BUFFER);
-            _supply(getAssetBalance());
+            // Swap wTLOS back to xTLOS to reloop strategy
+            DEPOSIT_TELOS.wTLOStoXTLOSConversion(getBorrowAssetBalance(), _address);
+            _supply(getSupplyAssetBalance());
         }
 
         return getLiquidity();
@@ -165,53 +191,53 @@ contract OmniDexLoop is ImmutableOwnable {
 
     /**
      * @param iterations - MAX loop count
-     * @return Withdrawn amount of ASSET to OWNER
+     * @return Withdrawn amount of SUPPLY_ASSET to OWNER
      */
     function exitPosition(uint256 iterations) external onlyOwner returns (uint256) {
         (, , , , uint256 ltv, ) = getPositionData(); // 4 decimals
 
         for (uint256 i = 0; i < iterations && getBorrowBalance() > 0; i++) {
             _redeemSupply(((getLiquidity() * 1e4) / ltv) - SAFE_BUFFER);
-            _repayBorrow(getAssetBalance());
+            _repayBorrow(getSupplyAssetBalance());
         }
 
         if (getBorrowBalance() == 0) {
             _redeemSupply(type(uint256).max);
         }
 
-        return _withdrawToOwner(address(ASSET));
+        return _withdrawToOwner(address(SUPPLY_ASSET));
     }
 
     // ---- internals, public onlyOwner in case of emergency ----
 
     /**
-     * amount in ASSET
+     * amount in SUPPLY_ASSET
      */
     function _supply(uint256 amount) public onlyOwner {
-        ASSET.safeIncreaseAllowance(address(LENDING_POOL), amount);
-        LENDING_POOL.deposit(address(ASSET), amount, address(this), 0);
+        SUPPLY_ASSET.safeIncreaseAllowance(address(LENDING_POOL), amount);
+        LENDING_POOL.deposit(address(SUPPLY_ASSET), amount, address(this), 0);
     }
 
     /**
-     * amount in ASSET
+     * amount in SUPPLY_ASSET
      */
     function _borrow(uint256 amount) public onlyOwner {
-        LENDING_POOL.borrow(address(ASSET), amount, USE_VARIABLE_DEBT, 0, address(this));
+        LENDING_POOL.borrow(address(BORROW_ASSET), amount, USE_VARIABLE_DEBT, 0, address(this));
     }
 
     /**
-     * amount in ASSET
+     * amount in SUPPLY_ASSET
      */
     function _redeemSupply(uint256 amount) public onlyOwner {
-        LENDING_POOL.withdraw(address(ASSET), amount, address(this));
+        LENDING_POOL.withdraw(address(SUPPLY_ASSET), amount, address(this));
     }
 
     /**
-     * amount in ASSET
+     * amount in SUPPLY_ASSET
      */
     function _repayBorrow(uint256 amount) public onlyOwner {
-        ASSET.safeIncreaseAllowance(address(LENDING_POOL), amount);
-        LENDING_POOL.repay(address(ASSET), amount, USE_VARIABLE_DEBT, address(this));
+        SUPPLY_ASSET.safeIncreaseAllowance(address(LENDING_POOL), amount);
+        LENDING_POOL.repay(address(BORROW_ASSET), amount, USE_VARIABLE_DEBT, address(this));
     }
 
     function _withdrawToOwner(address asset) public onlyOwner returns (uint256) {
