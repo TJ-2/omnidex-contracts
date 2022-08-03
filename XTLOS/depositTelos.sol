@@ -18,7 +18,7 @@ contract depositTLOS {
     IOmniDexLoop omnidexLoop;
     ICharmDojo karmaContract;
 
-    constructor(address _wrapTLOS, address _xTLOS, address _loopingContract, address _CharmDojo) public {
+    constructor(address _wrapTLOS, address _xTLOS, address _loopingContract, address _CharmDojo) {
         wrapTLOS = IWTLOS(_wrapTLOS);
         xTLOS = IXTLOS(_xTLOS);
         omnidexLoop = IOmniDexLoop(_loopingContract);
@@ -26,8 +26,8 @@ contract depositTLOS {
         }
 
     function getTier(address _address) public view returns(string memory result, uint id){
-        // uint256 userBal = karmaContract.charmBalance(_address);
-        uint256 userBal = 100000;
+        uint256 userBal = karmaContract.charmBalance(_address);
+        // uint256 userBal = 100000;
         if(userBal<100000){
             return ("Bronze",1);
         }
@@ -52,37 +52,28 @@ contract depositTLOS {
         uint256 maxDeposit =1000;
         uint256 principal = msg.value;
         require(principal<maxDeposit, "Exceeded maximum deposit allowance");
-        string memory UserTier; uint id; (,id) = getTier(_address);
+        uint id; (,id) = getTier(_address);
         
         if(id==1){
             uint256 iterations = 2;
-            omnidexLoop.enterPosition(principal, iterations);
-
+            omnidexLoop.enterPosition(principal, iterations, _address);
             }
         else if(id==2) {
-            uint256 iterations =3;
-            omnidexLoop.enterPosition(principal, iterations);
-
+            uint256 iterations = 3;
+            omnidexLoop.enterPosition(principal, iterations, _address);
         }
         else if(id==3) {
-            uint256 iterations =8;
-            omnidexLoop.enterPosition(principal, iterations);
-
+            uint256 iterations = 8;
+            omnidexLoop.enterPosition(principal, iterations, _address);
         }
         else if(id==4) {
-            uint256 iterations =20;
-            omnidexLoop.enterPosition(principal, iterations);
-
+            uint256 iterations = 20;
+            omnidexLoop.enterPosition(principal, iterations, _address);
         }
     }
 
     function getBalance() public view returns (uint256) {
         return address(this).balance;
-    }
-
-    function withdrawMoney(uint _amount) public {
-        address payable to = payable(msg.sender);
-        to.transfer(getBalance());
     }
 
     function Withdraw(uint _amount) public {
@@ -94,6 +85,22 @@ contract depositTLOS {
         // require(sent, “Failed to Complete”);
     }
 
+    // function withdrawMoney(uint _amount) public {
+    //    address payable to = payable(msg.sender);
+    //    to.transfer(getBalance());
+    // }
+
+    // unwrap borrowed wTLOS, 
+    // Deposit to sTLOS staking contract
+    // Mint equivilent xTLOS 
+    // deposit xTLOS back to the LoopContract "Enter position" (Make sure it doesn't loop infinite times)
+    function wTLOStoXTLOSConversion(uint256 amount, address _address) public {
+        wrapTLOS.withdraw(amount);
+        wrapTLOS.deposit{value: amount }();  // Dummy: Replace with staking contract
+        xTLOS.mint(address(this), amount);
+        XTLOSBalances[_address] += amount;
+        xTLOS.transfer(msg.sender, amount);
+    }
 }
 
     /**
@@ -125,6 +132,11 @@ contract depositTLOS {
        - Match solidity compiler versions to looping contract
      */
     
+
+
+
+
+
 
 
 
